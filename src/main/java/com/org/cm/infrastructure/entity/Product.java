@@ -26,9 +26,6 @@ public class Product {
     @ManyToMany(mappedBy = "products", cascade = CascadeType.ALL)
     private List<Order> order;
 
-    @ManyToMany(mappedBy = "products", cascade = CascadeType.ALL)
-    private List<Cafe> cafe;
-
     @Column(name = "isEnabled")
     private boolean isEnabled;
 
