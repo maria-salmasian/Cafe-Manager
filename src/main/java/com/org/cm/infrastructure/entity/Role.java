@@ -8,8 +8,13 @@ import javax.persistence.Table;
 
 @Entity
 @Data
-@Table(name = "roles", schema = "cm")
-public class Role {
+@Table(
+        name = "role",
+        indexes = {
+                @Index(name = "idx_r_roleName_removed", columnList = "roleName, removed" , unique = true)
+        }
+)
+public class Role extends DateAwareDomainEntity {
     @Id
     @Column(name = "role_id")
     @GeneratedValue(strategy= GenerationType.IDENTITY)

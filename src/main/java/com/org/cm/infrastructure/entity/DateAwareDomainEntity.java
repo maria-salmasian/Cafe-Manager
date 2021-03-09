@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
  */
 @MappedSuperclass
 public class DateAwareDomainEntity {
+    //def constr created at  now, updated = created
 
     @Column(name = "created", nullable = false)
     private LocalDateTime created;

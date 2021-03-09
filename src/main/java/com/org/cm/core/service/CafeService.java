@@ -11,8 +11,10 @@ import java.util.List;
 @Service
 public interface CafeService {
     List<CafeModel> getCafes();
-    CafeModel getCafeById(long id) throws CafeNotFoundException;
+    CafeModel getById(long id) throws CafeNotFoundException;
     Cafe saveCafe(CafeModel cafeModel) throws ValidationException;
     Cafe updateCafeByID(long id, CafeModel cafeModel) throws CafeNotFoundException;
     void deleteCafeByID(long id) throws CafeNotFoundException;
+   // Cafe assignManagerToCafe(long id, UserModel userModel) throws CafeNotFoundException;
+
 }

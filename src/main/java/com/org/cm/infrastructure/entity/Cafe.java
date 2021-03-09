@@ -1,6 +1,8 @@
 package com.org.cm.infrastructure.entity;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
@@ -10,13 +12,13 @@ import java.util.List;
 @Table(
         name = "cafe",
         indexes = {
-                @Index(name = "idx_c_name_removed", columnList = "name, removed")
+                @Index(name = "idx_c_name_removed", columnList = "name, removed" , unique = true)
         }
 )
 public class Cafe extends DateAwareDomainEntity {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "cafe_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

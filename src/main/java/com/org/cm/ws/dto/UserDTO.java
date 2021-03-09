@@ -1,4 +1,4 @@
-package com.org.cm.core.model;
+package com.org.cm.ws.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,13 +10,13 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserModel {
+public class UserDTO {
     private Long id;
     private String username;
     private String password;
     private boolean enabled;
-    private List<RoleModel> roles = new ArrayList<>();
-    private CafeModel cafe;
+    private List<RoleDTO> roles = new ArrayList<>();
+    private CafeDTO cafe;
 
 
 

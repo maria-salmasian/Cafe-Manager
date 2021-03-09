@@ -1,4 +1,4 @@
-package com.org.cm.core.model;
+package com.org.cm.ws.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,10 +9,10 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CafeTableModel {
+public class CafeTableDTO {
     private Long id;
-    private List<OrderModel> orders;
-    private List<UserModel> users;
+    private List<OrderDTO> orders;
+    private List<UserDTO> users;
     private long cafeId;
 
 }

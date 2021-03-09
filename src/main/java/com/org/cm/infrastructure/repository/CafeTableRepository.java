@@ -2,7 +2,11 @@ package com.org.cm.infrastructure.repository;
 
 import com.org.cm.infrastructure.entity.CafeTable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
+
+import java.util.List;
 
 public interface CafeTableRepository extends JpaRepository<CafeTable, Long> {
+     List<CafeTable> findAllByCafe(long cafeId);
+     CafeTable findCafeTableById(long id);
 }
+
