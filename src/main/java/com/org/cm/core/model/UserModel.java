@@ -15,8 +15,8 @@ public class UserModel {
     private String username;
     private String password;
     private boolean enabled;
-    private List<RoleModel> roles = new ArrayList<>();
-    private CafeModel cafe;
+    private List<Long> roleIds;
+    private long cafeId;
 
 
 

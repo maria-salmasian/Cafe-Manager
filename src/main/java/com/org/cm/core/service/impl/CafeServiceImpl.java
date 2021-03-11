@@ -3,13 +3,14 @@ package com.org.cm.core.service.impl;
 import com.org.cm.core.model.CafeModel;
 import com.org.cm.core.service.CafeService;
 import com.org.cm.core.service.exception.CafeNotFoundException;
-import com.org.cm.core.service.exception.ProductNotFound;
 import com.org.cm.infrastructure.entity.Cafe;
 import com.org.cm.infrastructure.entity.Product;
 import com.org.cm.infrastructure.repository.CafeRepository;
+import com.org.cm.infrastructure.repository.CafeTableRepository;
 import com.org.cm.infrastructure.repository.ProductRepository;
+import com.org.cm.infrastructure.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -26,15 +27,14 @@ public class CafeServiceImpl implements CafeService {
     private final
     CafeRepository cafeRepository;
 
-    private final ProductRepository productRepository;
-
     private final
-    ModelMapper modelMapper;
+    ProductRepository productRepository;
 
-    public CafeServiceImpl(CafeRepository cafeRepository, ProductRepository productRepository, ModelMapper modelMapper) {
+
+    @Autowired
+    public CafeServiceImpl(CafeRepository cafeRepository, ProductRepository productRepository) {
         this.cafeRepository = cafeRepository;
         this.productRepository = productRepository;
-        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class CafeServiceImpl implements CafeService {
         log.info("method getCafes is called");
         List<CafeModel> cafeModelList = (cafeRepository.findAll())
                 .stream()
-                .map(x -> modelMapper.map(x, CafeModel.class))
+                .map(x -> cafeToCafeModel(x))
                 .collect(Collectors.toList());
         Assert.notEmpty(cafeModelList, "No cafe found");
         return cafeModelList;
@@ -56,7 +56,7 @@ public class CafeServiceImpl implements CafeService {
         log.info("method getCafeById is called");
         Cafe cafe = cafeRepository.findById(id)
                 .orElseThrow(() -> new CafeNotFoundException("cafe not found for this id :: " + id));
-        CafeModel cafeModel = modelMapper.map(cafe, CafeModel.class);
+        CafeModel cafeModel = cafeToCafeModel(cafe);
         Assert.notNull(cafeModel, "cafeModel null");
         return cafeModel;
     }
@@ -66,19 +66,9 @@ public class CafeServiceImpl implements CafeService {
     public Cafe saveCafe(CafeModel cafeModel) {
         log.info("method saveCafe is called");
         Assert.notNull(cafeModel, "cafe not valid");
-        Cafe cafe = modelMapper.map(cafeModel, Cafe.class);
+        Cafe cafe = cafeModelToCafe(cafeModel);
         cafe.setCreated(LocalDateTime.now());
         cafe.setUpdated(LocalDateTime.now());
-        List<Product> products = new ArrayList<>();
-        cafeModel.getProductIds().forEach(x-> {
-            try {
-                products.add(productRepository.findById(x).orElseThrow(() ->
-                        new ProductNotFound("product not found for this id :: "+x)) );
-            } catch (ProductNotFound productNotFound) {
-                productNotFound.printStackTrace();
-            }
-        });
-        cafe.setProducts(products);
         return cafeRepository.save(cafe);
     }
 
@@ -91,17 +81,7 @@ public class CafeServiceImpl implements CafeService {
         Assert.notNull(cafeModel, "cafe not valid");
         Cafe cafeToBeUpdated = cafeRepository.findById(id).orElseThrow(() ->
                 new CafeNotFoundException("cafe not found for this id :: " + id));
-        Cafe cafe1 = modelMapper.map(cafeModel, Cafe.class);
-        List<Product> products = new ArrayList<>();
-        cafeModel.getProductIds().forEach(x-> {
-            try {
-                products.add(productRepository.findById(x).orElseThrow(() ->
-                        new ProductNotFound("product not found for this id :: "+x)) );
-            } catch (ProductNotFound productNotFound) {
-                productNotFound.printStackTrace();
-            }
-        });
-        cafe1.setProducts(products);
+        Cafe cafe1 = cafeModelToCafe(cafeModel);
         cafe1.setCreated(cafeToBeUpdated.getCreated());
         cafe1.setUpdated(LocalDateTime.now());
         cafeRepository.delete(cafeToBeUpdated);
@@ -118,4 +98,41 @@ public class CafeServiceImpl implements CafeService {
         cafe.setRemoved(LocalDateTime.now());
         cafeRepository.save(cafe);
     }
+
+
+    private CafeModel cafeToCafeModel(Cafe cafe) {
+        CafeModel cafeModel = new CafeModel();
+
+        List<Long> prIds = new ArrayList<>();
+        cafe.getProducts().forEach(x -> prIds.add(x.getId()));
+        cafeModel.setProductIds(prIds);
+
+        cafeModel.setName(cafe.getName());
+
+        List<Long> tbIds = new ArrayList<>();
+        cafe.getTables().forEach(x -> tbIds.add(x.getId()));
+        cafeModel.setTableIds(tbIds);
+
+        List<Long> userIds = new ArrayList<>();
+        cafe.getUsers().forEach(x -> userIds.add(x.getId()));
+        cafeModel.setUserIds(userIds);
+
+        cafeModel.setId(cafe.getId());
+
+        return cafeModel;
+    }
+
+
+    private Cafe cafeModelToCafe(CafeModel cafeModel) {
+        Cafe cafe = new Cafe();
+
+        List<Product> products = new ArrayList<>();
+        cafeModel.getProductIds().forEach(y -> products.add(productRepository.getProductById(y)));
+
+        cafe.setProducts(products);
+        cafe.setName(cafeModel.getName());
+
+        return cafe;
+    }
+
 }

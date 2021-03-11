@@ -15,8 +15,10 @@ public class UserDTO {
     private String username;
     private String password;
     private boolean enabled;
-    private List<RoleDTO> roles = new ArrayList<>();
-    private CafeDTO cafe;
+    private List<Long> roleIds;
+    private long cafeId;
+
+
 
 
 

@@ -12,8 +12,8 @@ import java.util.List;
 public class CafeModel {
     private Long id;
     private String name;
-    private List<UserModel> users;
-    private List<CafeTableModel> tables;
+    private List<Long> userIds;
+    private List<Long> tableIds;
     private List<Long> productIds;
 
 

@@ -13,8 +13,8 @@ import java.util.List;
 public class CafeDTO {
     private Long id;
     private String name;
-    private List<User> users;
-    private List<CafeTableDTO> tables;
+    private List<Long> userIds;
+    private List<Long> tableIds;
     private List<Long> productIds;
 
 

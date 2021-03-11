@@ -24,8 +24,4 @@ public class Role extends DateAwareDomainEntity {
     @Column(name = "roleName")
     private RoleName roleName;
 
-    @ManyToOne
-    private User user;
-
-
 }

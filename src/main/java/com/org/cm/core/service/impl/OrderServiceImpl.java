@@ -4,7 +4,7 @@ import com.org.cm.core.model.OrderModel;
 import com.org.cm.core.service.OrderService;
 import com.org.cm.core.service.exception.CafeTableNotFound;
 import com.org.cm.core.service.exception.OrderNotFoundException;
-import com.org.cm.core.service.exception.ProductNotFound;
+import com.org.cm.core.service.exception.ValidationException;
 import com.org.cm.infrastructure.entity.CafeTable;
 import com.org.cm.infrastructure.entity.Product;
 import com.org.cm.infrastructure.entity.TableOrder;
@@ -12,7 +12,7 @@ import com.org.cm.infrastructure.repository.CafeTableRepository;
 import com.org.cm.infrastructure.repository.OrderRepository;
 import com.org.cm.infrastructure.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -35,14 +35,12 @@ public class OrderServiceImpl implements OrderService {
     private final
     ProductRepository productRepository;
 
-    private final
-    ModelMapper modelMapper;
 
-    public OrderServiceImpl(OrderRepository orderRepository, CafeTableRepository cafeTableRepository, ProductRepository productRepository, ModelMapper modelMapper) {
+    @Autowired
+    public OrderServiceImpl(OrderRepository orderRepository, CafeTableRepository cafeTableRepository, ProductRepository productRepository) {
         this.orderRepository = orderRepository;
         this.cafeTableRepository = cafeTableRepository;
         this.productRepository = productRepository;
-        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -51,7 +49,7 @@ public class OrderServiceImpl implements OrderService {
         log.info("method getOrders is invoked");
         List<OrderModel> orderModelList = (orderRepository.findAll())
                 .stream()
-                .map(x -> modelMapper.map(x, OrderModel.class))
+                .map(this::tableOrderToTableOrderModel)
                 .collect(Collectors.toList());
         Assert.notEmpty(orderModelList, "No order found");
         return orderModelList;
@@ -64,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
         log.info("method getOrderById is invoked");
         TableOrder order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("order not found for this id :: " + id));
-        OrderModel orderModel = modelMapper.map(order, OrderModel.class);
+        OrderModel orderModel =tableOrderToTableOrderModel(order);
         Assert.notNull(orderModel, "orderModel null");
         return orderModel;
     }
@@ -78,21 +76,9 @@ public class OrderServiceImpl implements OrderService {
         CafeTable cafetable = cafeTableRepository.findById(orderModel.getCafeTableId())
                 .orElseThrow(() -> new CafeTableNotFound("Cafe table specified not found"));
         if (cafetable.getRemoved() == null) {
-            TableOrder tableOrder = modelMapper.map(orderModel, TableOrder.class);
+            TableOrder tableOrder = tableOrderModelToTableOrder(orderModel);
             tableOrder.setCreated(LocalDateTime.now());
             tableOrder.setUpdated(LocalDateTime.now());
-
-            List<Product> products = new ArrayList<>();
-            orderModel.getProducts().forEach(x-> {
-                try {
-                    products.add(productRepository.findById(x).orElseThrow(() ->
-                            new ProductNotFound("product not found for this id :: "+x)) );
-                } catch (ProductNotFound productNotFound) {
-                    productNotFound.printStackTrace();
-                }
-            });
-
-            tableOrder.setProducts(products);
 
             return orderRepository.save(tableOrder);
 
@@ -108,25 +94,9 @@ public class OrderServiceImpl implements OrderService {
         Assert.notNull(orderModel, "order not valid");
         TableOrder orderToBeUpdated = orderRepository.findById(id).orElseThrow(() ->
                 new OrderNotFoundException("cafe order not found for this id :: " + id));
-        TableOrder tableOrder = modelMapper.map(orderModel, TableOrder.class);
         CafeTable cafeTable = cafeTableRepository.findById(orderModel.getCafeTableId()).orElseThrow(() -> new CafeTableNotFound("Cafe table not found"));
         if (cafeTable.getRemoved() == null) {
-            tableOrder.setCafeTable(cafeTable);
-            tableOrder.setCreated(orderToBeUpdated.getCreated());
-            tableOrder.setUpdated(LocalDateTime.now());
-
-            List<Product> products = new ArrayList<>();
-            orderModel.getProducts().forEach(x-> {
-                try {
-                    products.add(productRepository.findById(x).orElseThrow(() ->
-                            new ProductNotFound("product not found for this id :: "+x)) );
-                } catch (ProductNotFound productNotFound) {
-                    productNotFound.printStackTrace();
-                }
-            });
-
-            tableOrder.setProducts(products);
-
+            TableOrder tableOrder = tableOrderModelToTableOrder(orderModel);
             orderRepository.delete(orderToBeUpdated);
             return orderRepository.save(tableOrder);
         } else throw new CafeTableNotFound("cafe table is removed");
@@ -143,4 +113,52 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(tableOrder);
 
     }
+
+
+    private TableOrder tableOrderModelToTableOrder(OrderModel orderModel) {
+        TableOrder tableOrder = new TableOrder();
+
+        List<Product> prs = new ArrayList<>();
+        orderModel.getProducts().forEach(x -> {
+            Product product = productRepository.getProductById(x);
+            if (product.isEnabled())
+            prs.add(product);
+            else {
+                try {
+                    throw new ValidationException("product not enables");
+                } catch (ValidationException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        });
+        tableOrder.setProducts(prs);
+
+
+
+        tableOrder.setCafeTable(cafeTableRepository.getCafeTableById(orderModel.getCafeTableId()));
+        tableOrder.setFinished(orderModel.isFinished());
+
+
+        return tableOrder;
+    }
+
+
+    private OrderModel tableOrderToTableOrderModel(TableOrder tableOrder) {
+        OrderModel orderModel = new OrderModel();
+        orderModel.setFinished(tableOrder.isFinished());
+
+        orderModel.setId(tableOrder.getId());
+        orderModel.setCafeTableId(tableOrder.getCafeTable().getId());
+
+        List<Long> prIds = new ArrayList<>();
+        tableOrder.getProducts().forEach(x ->  {
+            if(x!= null)
+                prIds.add(x.getId());
+        });
+        orderModel.setProducts(prIds);
+
+        return orderModel;
+    }
 }
+

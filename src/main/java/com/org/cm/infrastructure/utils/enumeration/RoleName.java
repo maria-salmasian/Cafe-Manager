@@ -21,7 +21,7 @@ public enum RoleName {
         this.id =id;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

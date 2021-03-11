@@ -10,7 +10,8 @@ import javax.persistence.Table;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(
         name = "table_order",
         indexes = {

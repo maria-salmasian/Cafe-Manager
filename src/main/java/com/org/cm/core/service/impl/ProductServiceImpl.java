@@ -7,6 +7,7 @@ import com.org.cm.infrastructure.entity.Product;
 import com.org.cm.infrastructure.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -23,6 +24,7 @@ public class ProductServiceImpl implements ProductService {
     private final
     ModelMapper modelMapper;
 
+    @Autowired
     public ProductServiceImpl(ProductRepository productRepository, ModelMapper modelMapper) {
         this.productRepository = productRepository;
         this.modelMapper = modelMapper;

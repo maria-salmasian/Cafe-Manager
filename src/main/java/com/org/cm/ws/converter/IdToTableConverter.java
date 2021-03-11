@@ -1,5 +1,6 @@
 package com.org.cm.ws.converter;
 
+
 import com.org.cm.infrastructure.entity.CafeTable;
 import com.org.cm.infrastructure.entity.User;
 import com.org.cm.infrastructure.repository.CafeTableRepository;

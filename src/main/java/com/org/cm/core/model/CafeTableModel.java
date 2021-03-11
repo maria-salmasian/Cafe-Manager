@@ -11,8 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 public class CafeTableModel {
     private Long id;
-    private List<OrderModel> orders;
-    private List<UserModel> users;
+    private List<Long> orderIds;
+    private List<Long> userIds;
     private long cafeId;
 
 }

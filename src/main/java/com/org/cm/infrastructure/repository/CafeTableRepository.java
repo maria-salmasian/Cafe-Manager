@@ -8,5 +8,6 @@ import java.util.List;
 public interface CafeTableRepository extends JpaRepository<CafeTable, Long> {
      List<CafeTable> findAllByCafe(long cafeId);
      CafeTable findCafeTableById(long id);
+     CafeTable getCafeTableById(long id);
 }
 
