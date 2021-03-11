@@ -46,6 +46,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
                 .authorizeRequests().antMatchers("/authenticate").permitAll()
+
+//                .antMatchers("/user").hasRole("ADMIN")
+//                .antMatchers("/cafe").access("hasRole('ADMIN') or hasRole('MANAGER')")
+//                .antMatchers("/cafeTable").access("hasRole('ADMIN') or hasRole('MANAGER')")
+//                .antMatchers("/tableOrder").access("hasRole('ADMIN') or hasRole('WAITER')")
+//                .antMatchers("/product").access("hasRole('ADMIN') or hasRole('MANAGER')")
+//
+
                 .anyRequest().authenticated().and().
                 exceptionHandling().and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

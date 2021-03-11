@@ -87,6 +87,7 @@ public class UserServiceImpl implements UserService {
         user.setCreated(userToBeUpdated.getCreated());
         user.setUpdated(LocalDateTime.now());
         userRepository.delete(userToBeUpdated);
+
         return userRepository.save(user);
 
     }
