@@ -2,6 +2,8 @@ package com.org.cm.config;
 
 import com.org.cm.core.service.impl.UserDetailsServiceImpl;
 import com.org.cm.filters.RequestFilter;
+import com.org.cm.infrastructure.entity.Role;
+import com.org.cm.infrastructure.utils.enumeration.RoleName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -51,7 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .antMatchers("/cafe").access("hasRole('ADMIN') or hasRole('MANAGER')")
 //                .antMatchers("/cafeTable").access("hasRole('ADMIN') or hasRole('MANAGER')")
 //                .antMatchers("/tableOrder").access("hasRole('ADMIN') or hasRole('WAITER')")
-//                .antMatchers("/product").access("hasRole('ADMIN') or hasRole('MANAGER')")
+//                .antMatchers("/product").hasAnyRole(Role.ADMIN, Role.WAITER)
 //
 
                 .anyRequest().authenticated().and().

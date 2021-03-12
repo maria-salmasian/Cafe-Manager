@@ -97,7 +97,9 @@ public class OrderServiceImpl implements OrderService {
         CafeTable cafeTable = cafeTableRepository.findById(orderModel.getCafeTableId()).orElseThrow(() -> new CafeTableNotFound("Cafe table not found"));
         if (cafeTable.getRemoved() == null) {
             TableOrder tableOrder = tableOrderModelToTableOrder(orderModel);
-            orderRepository.delete(orderToBeUpdated);
+            tableOrder.setCreated(orderToBeUpdated.getCreated());
+            tableOrder.setUpdated(LocalDateTime.now());
+            orderToBeUpdated.setRemoved(LocalDateTime.now());
             return orderRepository.save(tableOrder);
         } else throw new CafeTableNotFound("cafe table is removed");
 

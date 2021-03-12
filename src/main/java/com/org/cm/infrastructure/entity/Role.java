@@ -15,6 +15,7 @@ import javax.persistence.Table;
         }
 )
 public class Role extends DateAwareDomainEntity {
+
     @Id
     @Column(name = "role_id")
     @GeneratedValue(strategy= GenerationType.IDENTITY)

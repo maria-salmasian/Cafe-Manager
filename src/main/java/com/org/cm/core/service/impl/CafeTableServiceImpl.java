@@ -106,7 +106,7 @@ public class CafeTableServiceImpl implements CafeTableService {
         if (cafe.getRemoved() == null) {
             cafeTable.setCreated(cafeTableToBeUpdated.getCreated());
             cafeTable.setUpdated(LocalDateTime.now());
-            cafeTableRepository.delete(cafeTableToBeUpdated);
+            (cafeTableToBeUpdated).setRemoved(LocalDateTime.now());
             return cafeTableRepository.save(cafeTable);
         } else throw new CafeTableNotFound("cafe is removed");
 
